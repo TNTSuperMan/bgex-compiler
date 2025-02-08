@@ -8,16 +8,15 @@ import { parseVariable, type BGEXVar } from "./var"
 
 export type BGEXModule = {
     path: string,
-    statements: BGEXGlobalStatement[],
+    vars: BGEXVar[],
+    funcs: BGEXFunction[],
     imports: {
         path: string,
         specifiers: [string, string][]
     }[],
-    exports: (BGEXFunction | BGEXVar)[]
+    exportFunctions: BGEXFunction[],
+    exportVariables: BGEXVar[]
 }
-
-type BGEXGlobalStatement = 
-    BGEXFunction | BGEXVar
 
 export const parseBGEX = (path: string): BGEXModule | undefined => {
     if(!existsSync(path)) throw new Error(`${path} not found`)
@@ -28,17 +27,19 @@ export const parseBGEX = (path: string): BGEXModule | undefined => {
             path: string,
             specifiers: [string,string][]
         }[] = [];
-        const exports: (BGEXFunction | BGEXVar)[] = [];
-        return {
-            path,
-            imports,
-            exports,
-            statements: token.body.map((e):BGEXFunction | BGEXVar[] | void=>{
+        const exportFunctions: BGEXFunction[] = [];
+        const exportVariables: BGEXVar[] = [];
+        const funcs: BGEXFunction[] = [];
+        const vars: BGEXVar[] = [];
+
+        token.body.forEach(e=>{
             switch(e.type){
                 case "FunctionDeclaration":
-                    return parseFunction(e);
+                    funcs.push(parseFunction(e));
+                    break;
                 case "VariableDeclaration":
-                    return parseVariable(e);
+                    vars.push(...parseVariable(e));
+                    break;
                 case "ImportDeclaration":
                     const p = e.source.value;
                     if(typeof p == "string"){
@@ -59,24 +60,25 @@ export const parseBGEX = (path: string): BGEXModule | undefined => {
                             })
                         })
                     }
-                    return;
+                    break;
                 case "ExportNamedDeclaration":
                     if(!e.declaration) return serr("Need export declartion", e.start);
                     else switch(e.declaration.type){
                         case "FunctionDeclaration":
-                            exports.push(parseFunction(e.declaration));
+                            exportFunctions.push(parseFunction(e.declaration));
                             break;
                         case "VariableDeclaration":
-                            exports.push(...parseVariable(e.declaration));
+                            exportVariables.push(...parseVariable(e.declaration));
                             break;
                         default:
                             return serr(`${e.type} is not supported export type`, e.start)
                     }
-                    return;
+                    break;
                 default:
                     return serr(`${e.type} is not supported`, e.start)
             }
-        }).filter(e=>e != undefined).flat()}
+        })
+        return {path, imports, funcs, vars, exportFunctions, exportVariables}
     }catch(e){
         if(e instanceof SyntaxError){
             if(typeof e.cause == "number"){
