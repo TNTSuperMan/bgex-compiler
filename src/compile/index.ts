@@ -1,4 +1,5 @@
 import type { BGEXModule } from "../parse";
+import { compileFunc } from "./func";
 import { parseVariable, type Variable } from "./var";
 
 export const compileBGEX = (token: BGEXModule): [string, Variable[]] => {
@@ -13,6 +14,8 @@ export const compileBGEX = (token: BGEXModule): [string, Variable[]] => {
     token.funcs.forEach(e=>
         fnmap.set(e.name, e.name + crypto.randomUUID()))
 
+    asm.push(...token.funcs.map(e => compileFunc(e, fnmap.get(e.name))))
+    asm.push(...token.exportFunctions.map(e => compileFunc(e)))
 
     return [asm.join("\n"), expVars];
 }
