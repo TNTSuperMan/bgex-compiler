@@ -4,7 +4,7 @@ import { dirname, resolve } from "node:path"
 import { BGEXExpressionType, parseExpression, type BGEXExpression } from "./expr"
 import { serr } from "../util"
 
-type BGEXModule = {
+export type BGEXModule = {
     path: string,
     statements: BGEXGlobalStatement[],
     imports: {
@@ -52,8 +52,7 @@ const parseStatement = <T extends Statement>(statement: T): BGEXVar[] | BGEXExpr
     }
 }
 
-export const parseBGEX = (root: string, source: string): BGEXModule | undefined => {
-    const path = resolve(root, source)
+export const parseBGEX = (path: string): BGEXModule | undefined => {
     if(!existsSync(path)) throw new Error(`${path} not found`)
     const src = readFileSync(path).toString()
     const token = parse(src, {ecmaVersion: "latest", sourceType: "module"});
