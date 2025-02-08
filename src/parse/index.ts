@@ -19,7 +19,7 @@ export type BGEXModule = {
 type BGEXGlobalStatement = 
     BGEXFunction | BGEXVar
 
-export const parseStatement = <T extends Statement>(statement: T): BGEXVar[] | BGEXExpression => {
+export const parseStatement = (statement: Statement): BGEXVar[] | BGEXExpression => {
     if(statement.type == "ExpressionStatement"){
         return parseExpression(statement.expression);
     }else if(statement.type == "VariableDeclaration"){
