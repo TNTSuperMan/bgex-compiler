@@ -1,6 +1,6 @@
 import { parse, type Statement, type VariableDeclaration } from "acorn"
 import { existsSync, readFileSync } from "node:fs"
-import { resolve } from "node:path"
+import { dirname, resolve } from "node:path"
 import { BGEXExpressionType, parseExpression, type BGEXExpression } from "./expr"
 import { serr } from "../util"
 
@@ -81,6 +81,8 @@ export const parseBGEX = (root: string, source: string): BGEXModule | undefined 
                 case "ImportDeclaration":
                     const p = e.source.value;
                     if(typeof p == "string"){
+                        const fullp = resolve(dirname(path), p)
+                        if(existsSync(fullp)) return serr(`Not found module: ${fullp}`, e.start);
                         imports.push({
                             path: p,
                             specifiers: e.specifiers.map(e=>{
