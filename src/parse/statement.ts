@@ -12,7 +12,7 @@ export const enum BGEXStatementType{
 
 export type BGEXStatement = {
     type: BGEXStatementType.var,
-    var: BGEXVar
+    vars: BGEXVar[]
 } | {
     type: BGEXStatementType.expr,
     expr: BGEXExpression
@@ -27,11 +27,17 @@ export type BGEXStatement = {
     code: BGEXStatement[]
 }
 
-export const parseStatement = (statement: Statement): BGEXVar[] | BGEXExpression => {
+export const parseStatement = (statement: Statement): BGEXStatement => {
     if(statement.type == "ExpressionStatement"){
-        return parseExpression(statement.expression);
+        return{
+            type: BGEXStatementType.expr,
+            expr: parseExpression(statement.expression)
+        }
     }else if(statement.type == "VariableDeclaration"){
-        return parseVariable(statement);
+        return{
+            type: BGEXStatementType.var,
+            vars: parseVariable(statement)
+        }
     }else{
         return serr(`${statement.type} is not supported`, statement.start);
     }

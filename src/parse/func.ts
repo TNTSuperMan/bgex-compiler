@@ -2,15 +2,13 @@ import type { FunctionDeclaration } from "acorn";
 import { serr } from "../util";
 import type { BGEXExpression } from "./expr";
 import type { BGEXVar } from "./var";
-import { parseStatement } from "./statement";
+import { parseStatement, type BGEXStatement } from "./statement";
 
 export type BGEXFunction = {
     type: "function",
     name: string,
     args: string[],
-    statements: (
-        BGEXExpression | BGEXVar
-    )[]
+    statements: BGEXStatement[]
 }
 
 export const parseFunction = (token: FunctionDeclaration): BGEXFunction => ({
