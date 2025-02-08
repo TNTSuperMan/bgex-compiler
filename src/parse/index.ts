@@ -6,7 +6,11 @@ import { serr } from "../util"
 
 type BGEXModule = {
     path: string,
-    statements: BGEXGlobalStatement[]
+    statements: BGEXGlobalStatement[],
+    imports: {
+        path: string,
+        specifiers: [string, string][]
+    }[]
 }
 
 type BGEXGlobalStatement = 
@@ -54,8 +58,13 @@ export const parseBGEX = (root: string, source: string): BGEXModule | undefined 
     const src = readFileSync(path).toString()
     const token = parse(src, {ecmaVersion: "latest", sourceType: "module"});
     try{
+        const imports: {
+            path: string,
+            specifiers: [string,string][]
+        }[] = [];
         return {
             path,
+            imports,
             statements: token.body.map((e):BGEXFunction | BGEXVar[] | void=>{
             switch(e.type){
                 case "FunctionDeclaration":
@@ -70,6 +79,23 @@ export const parseBGEX = (root: string, source: string): BGEXModule | undefined 
                 case "VariableDeclaration":
                     return parseVariable(e);
                 case "ImportDeclaration":
+                    const p = e.source.value;
+                    if(typeof p == "string"){
+                        imports.push({
+                            path: p,
+                            specifiers: e.specifiers.map(e=>{
+                                if(e.type == "ImportSpecifier"){
+                                    if(e.imported.type == "Identifier"){
+                                        return [e.imported.name, e.local.name]
+                                    }else{
+                                        return serr(`Cannot import ${e.imported.type} value`, e.start);
+                                    }
+                                }else{
+                                    return serr(`Cannot import ${e.type}`, e.start);
+                                }
+                            })
+                        })
+                    }
                     return;
                 default:
                     return serr(`${e.type} is not supported`, e.start)
