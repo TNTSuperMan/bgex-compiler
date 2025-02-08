@@ -1,7 +1,7 @@
 import type { Expression } from "acorn"
 import { parseBinaryExpression, type BGEXBinaryExpression } from "./binary"
 import { parseUnaryExpression, type BGEXUnaryExpression } from "./unary"
-import { serr } from "../util"
+import { serr } from "../../util"
 
 export const enum BGEXExpressionType{
     var,

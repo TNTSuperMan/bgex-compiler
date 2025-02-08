@@ -1,6 +1,6 @@
 import type { UnaryExpression } from "acorn"
 import { parseExpression, type BGEXExpression } from "."
-import { serr } from "../util";
+import { serr } from "../../util";
 
 export type BGEXUnaryExpressionType =
     "!"|"~";

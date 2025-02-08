@@ -2,7 +2,7 @@ import { parse, type Statement, type VariableDeclaration } from "acorn"
 import { existsSync, readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { BGEXExpressionType, parseExpression, type BGEXExpression } from "./expr"
-import { serr } from "./util"
+import { serr } from "../util"
 
 type BGEXModule = {
     path: string,
