@@ -1,7 +1,6 @@
-import { parse, type Statement, type VariableDeclaration } from "acorn"
+import { parse } from "acorn"
 import { existsSync, readFileSync } from "node:fs"
 import { dirname, resolve } from "node:path"
-import { BGEXExpressionType, parseExpression, type BGEXExpression } from "./expr"
 import { serr } from "../util"
 import { parseFunction, type BGEXFunction } from "./func"
 import { parseVariable, type BGEXVar } from "./var"
