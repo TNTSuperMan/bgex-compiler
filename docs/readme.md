@@ -1,0 +1,2 @@
+bge-compilerのJSトークナイザーによる新規実装です。
+acornでやります。
