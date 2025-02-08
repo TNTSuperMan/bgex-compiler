@@ -29,9 +29,15 @@ export type BGEXStatement = {
 
 export const parseStatement = (statement: Statement): BGEXStatement => {
     if(statement.type == "ExpressionStatement"){
-        return{
-            type: BGEXStatementType.expr,
-            expr: parseExpression(statement.expression)
+        switch(statement.expression.type){
+            case "CallExpression":
+            case "AssignmentExpression":
+                return{
+                    type: BGEXStatementType.expr,
+                    expr: parseExpression(statement.expression)
+                }
+            default:
+                return serr(`${statement.expression.type} is not statement`, statement.expression.start);
         }
     }else if(statement.type == "VariableDeclaration"){
         return{
