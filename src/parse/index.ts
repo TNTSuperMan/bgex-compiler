@@ -3,6 +3,8 @@ import { existsSync, readFileSync } from "node:fs"
 import { dirname, resolve } from "node:path"
 import { BGEXExpressionType, parseExpression, type BGEXExpression } from "./expr"
 import { serr } from "../util"
+import { parseFunction, type BGEXFunction } from "./func"
+import { parseVariable, type BGEXVar } from "./var"
 
 export type BGEXModule = {
     path: string,
@@ -10,39 +12,14 @@ export type BGEXModule = {
     imports: {
         path: string,
         specifiers: [string, string][]
-    }[]
+    }[],
+    exports: (BGEXFunction | BGEXVar)[]
 }
 
 type BGEXGlobalStatement = 
     BGEXFunction | BGEXVar
 
-type BGEXVar = {
-    type: "var" | "let" | "const",
-    name: string,
-    isbig: boolean
-    initial?: BGEXExpression
-}
-
-type BGEXFunction = {
-    type: "function",
-    name: string,
-    args: string[],
-    statements: (
-        BGEXExpression | BGEXVar
-    )[]
-}
-
-const parseVariable = (statement: VariableDeclaration): BGEXVar[] => 
-    statement.declarations.map<BGEXVar>(t=>{
-        const initial = t.init ? parseExpression(t.init) : void 0;
-        return{
-            type: statement.kind,
-            name: t.id.type == "Identifier" ? t.id.name : serr(`${t.id.type} var define is not supported`, t.start),
-            isbig: initial?.type == BGEXExpressionType.num ? initial.isbig : false,
-            initial: initial
-}})
-
-const parseStatement = <T extends Statement>(statement: T): BGEXVar[] | BGEXExpression => {
+export const parseStatement = <T extends Statement>(statement: T): BGEXVar[] | BGEXExpression => {
     if(statement.type == "ExpressionStatement"){
         return parseExpression(statement.expression);
     }else if(statement.type == "VariableDeclaration"){
@@ -61,20 +38,15 @@ export const parseBGEX = (path: string): BGEXModule | undefined => {
             path: string,
             specifiers: [string,string][]
         }[] = [];
+        const exports: (BGEXFunction | BGEXVar)[] = [];
         return {
             path,
             imports,
+            exports,
             statements: token.body.map((e):BGEXFunction | BGEXVar[] | void=>{
             switch(e.type){
                 case "FunctionDeclaration":
-                    return {
-                        type: "function",
-                        name: e.id.name,
-                        args: e.params.map(e=>
-                            e.type == "Identifier" ? e.name :
-                            serr(`${e.type} Argument is not supported`, e.start)),
-                        statements: e.body.body.map(e=>parseStatement(e)).flat()
-                    }
+                    return parseFunction(e);
                 case "VariableDeclaration":
                     return parseVariable(e);
                 case "ImportDeclaration":
@@ -96,6 +68,19 @@ export const parseBGEX = (path: string): BGEXModule | undefined => {
                                 }
                             })
                         })
+                    }
+                    return;
+                case "ExportNamedDeclaration":
+                    if(!e.declaration) return serr("Need export declartion", e.start);
+                    else switch(e.declaration.type){
+                        case "FunctionDeclaration":
+                            exports.push(parseFunction(e.declaration));
+                            break;
+                        case "VariableDeclaration":
+                            exports.push(...parseVariable(e.declaration));
+                            break;
+                        default:
+                            return serr(`${e.type} is not supported export type`, e.start)
                     }
                     return;
                 default:
