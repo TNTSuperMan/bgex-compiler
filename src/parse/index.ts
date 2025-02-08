@@ -19,16 +19,6 @@ export type BGEXModule = {
 type BGEXGlobalStatement = 
     BGEXFunction | BGEXVar
 
-export const parseStatement = (statement: Statement): BGEXVar[] | BGEXExpression => {
-    if(statement.type == "ExpressionStatement"){
-        return parseExpression(statement.expression);
-    }else if(statement.type == "VariableDeclaration"){
-        return parseVariable(statement);
-    }else{
-        return serr(`${statement.type} is not supported`, statement.start);
-    }
-}
-
 export const parseBGEX = (path: string): BGEXModule | undefined => {
     if(!existsSync(path)) throw new Error(`${path} not found`)
     const src = readFileSync(path).toString()

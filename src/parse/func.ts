@@ -1,8 +1,8 @@
 import type { FunctionDeclaration } from "acorn";
 import { serr } from "../util";
-import { parseStatement } from ".";
 import type { BGEXExpression } from "./expr";
 import type { BGEXVar } from "./var";
+import { parseStatement } from "./statement";
 
 export type BGEXFunction = {
     type: "function",
