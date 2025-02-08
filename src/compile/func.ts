@@ -5,6 +5,6 @@ import { useVariable } from "./var";
 export const compileFunc = (token: BGEXFunction, name?: string) => {
     const n = name ?? token.name;
     const args = token.args.map(useVariable);
-    return`:${n}
+    return`:fn_${n}
 ${args.map(e=>`${ptr2asm(e[1])}`)}`
 }
