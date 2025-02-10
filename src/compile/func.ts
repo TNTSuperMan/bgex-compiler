@@ -6,5 +6,5 @@ export const compileFunc = (token: BGEXFunction, name?: string) => {
     const n = name ?? token.name;
     const args = token.args.map(useVariable);
     return`:fn_${n}
-${args.map(e=>`${ptr2asm(e[1])}`)}`
+${args.map(e=>`${ptr2asm(e[2])}`)}`
 }
