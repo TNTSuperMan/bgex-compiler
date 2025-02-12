@@ -7,8 +7,9 @@ import { compileBGEX } from "./compile";
 
 export const BGEXCompile = (source: string) => {
     const importlist: Map<string, BGEXModule> = new Map;
-    const pathStack: string[] = [];
-    for(let sp = resolve(process.cwd(), source); pathStack.length; pathStack.pop())
+    const absSP = resolve(process.cwd(), source);
+    const pathStack: string[] = [absSP];
+    for(let sp = absSP; pathStack.length; pathStack.pop())
         if(!importlist.has(sp)){
             const token = parseBGEX(sp);
             if(!token) return;
