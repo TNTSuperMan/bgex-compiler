@@ -7,10 +7,10 @@ import { compileBGEX } from "./compile";
 
 export const BGEXCompile = (source: string) => {
     const importlist: Map<string, BGEXModule> = new Map;
-    const pathStack: string[] = [resolve(process.cwd(), source)];
-    while(pathStack.length)
-        if(!importlist.has(pathStack[0])){
-            const token = parseBGEX(pathStack[0]);
+    const pathStack: string[] = [];
+    for(let sp = resolve(process.cwd(), source); pathStack.length; pathStack.pop())
+        if(!importlist.has(sp)){
+            const token = parseBGEX(sp);
             if(!token) return;
             pathStack.push(...token.imports.map(e=>e.path));
         }
