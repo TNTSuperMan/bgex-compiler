@@ -1,34 +1,31 @@
+import { toExportiveFunction, type Exports, type FunctionExport } from "../exportive";
 import type { BGEXModule } from "../parse";
+import type { BGEXFunction } from "../parse/func";
 import { compileFunc } from "./func";
 import { escapeFunction } from "./util";
 import { parseVariable, type Variable } from "./var";
 
-export type BGEXModules = Map<string, (
-    [true, string, string] | //Function
-    [false, string, Variable] // Variable
-)[]>;
-
 export type BGEXScope = {
     vars: Map<string, Variable>[],
-    funcs: Map<string, string>
+    funcs: Map<string, FunctionExport>
 }
 
-export const compileBGEX = (token: BGEXModule, modules: BGEXModules): string => {
+export const compileBGEX = (token: BGEXModule, exports: Map<string, Exports>): string => {
     let asm = [`;${token.path}`];
     
     const scope: BGEXScope = {
         vars:[new Map], funcs: new Map };
     
     token.imports.forEach(e=>{
-        const m = modules.get(e.path);
+        const m = exports.get(e.path);
         if(!m) throw new ReferenceError("Not found module: " + e.path)
         e.specifiers.forEach(t=>{
-            const v = m.find(e=>e[1] === t[0]);
-            if(!v) throw new ReferenceError("Not found token: " + t[0]);
-            if(v[0]){
-                scope.funcs.set(t[1], v[2]);
+            const res = m.find(e=>e[1] == t[0]);
+            if(!res) throw new ReferenceError("Not found token: " + t[0]);
+            if(res[0] == 0){
+                scope.funcs.set(res[1], res);
             }else{
-                scope.vars[0].set(t[1], v[2]);
+                scope.vars[0].set(res[1], res[2]);
             }
         })
     })
@@ -36,12 +33,10 @@ export const compileBGEX = (token: BGEXModule, modules: BGEXModules): string => 
     const vars: Variable[] = token.vars.map(parseVariable);
     vars.forEach(e=>scope.vars[0].set(e[1], e));
 
-    const fnmap: Map<string, string> = new Map;
-    token.funcs.forEach(e=>
-        fnmap.set(e.name, e.name + crypto.randomUUID()))
-    fnmap.forEach((v,k)=>scope.funcs.set(k, v));
+    const fnmap: [BGEXFunction, `${string}-${string}-${string}-${string}-${string}`][] = token.funcs.map(e=>[e, crypto.randomUUID()]);
+    fnmap.forEach(e=>scope.funcs.set(e[0].name, toExportiveFunction(e[0], e[1])))
 
-    asm.push(...token.funcs.map(e => compileFunc(scope, e, fnmap.get(e.name))))
+    asm.push(...fnmap.map(e => compileFunc(scope, e[0], escapeFunction(e[1], e[0].name))))
     asm.push(...token.exportFunctions.map(e => compileFunc(scope, e, escapeFunction(token.path, e.name))))
 
     return asm.join("\n");
