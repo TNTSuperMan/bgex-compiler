@@ -1,7 +1,5 @@
 import { resolve } from "node:path";
 import { parseBGEX, type BGEXModule } from "./parse"
-import { escapeFunction } from "./compile/util";
-import { useVariable, type Variable } from "./compile/var";
 import { toExportiveToken, type Exports } from "./exportive";
 import { compileBGEX } from "./compile";
 

@@ -1,10 +1,8 @@
 import type { BGEXScope } from ".";
 import type { BGEXFunction } from "../parse/func";
-import { BGEXStatementType } from "../parse/statement";
-import { compileExpression } from "./expr";
 import { compileStatement } from "./statement";
 import { ptr2asm } from "./util";
-import { parseVariable, useVariable } from "./var";
+import { useVariable } from "./var";
 
 export const compileFunc = (scope: BGEXScope,token: BGEXFunction, name?: string): string => {
     const n = name ?? token.name;
