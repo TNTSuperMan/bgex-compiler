@@ -20,5 +20,5 @@ export const BGEXCompile = (source: string) => {
     importlist.forEach(e=>exports.set(e.path, toExportiveToken(e)));
 
     const results = importlist.values().map(e=>compileBGEX(e, exports));
-    console.log(Array.from(results));
+    return results;
 }
