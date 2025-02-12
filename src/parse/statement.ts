@@ -27,10 +27,10 @@ export type BGEXStatement = {
     code: BGEXStatement[]
 }
 
-export const parseStatement = (statement: Statement): BGEXStatement[] => {
+export const parseStatements = (statement: Statement): BGEXStatement[] => {
     switch(statement.type){
         case "BlockStatement":
-            return statement.body.map(parseStatement).flat();
+            return statement.body.map(parseStatements).flat();
         case "ExpressionStatement":
             switch(statement.expression.type){
                 case "CallExpression":
@@ -51,14 +51,14 @@ export const parseStatement = (statement: Statement): BGEXStatement[] => {
             return[{
                 type: BGEXStatementType.if,
                 condition: parseExpression(statement.test),
-                true: parseStatement(statement.consequent),
-                false: statement.alternate ? parseStatement(statement.alternate) : undefined
+                true: parseStatements(statement.consequent),
+                false: statement.alternate ? parseStatements(statement.alternate) : undefined
             }]
         case "WhileStatement":
             return[{
                 type: BGEXStatementType.while,
                 condition: parseExpression(statement.test),
-                code: parseStatement(statement.body)
+                code: parseStatements(statement.body)
             }]
         default:
             return serr(`${statement.type} is not supported`, statement.start);
