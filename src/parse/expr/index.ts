@@ -42,15 +42,8 @@ export const parseExpression = (expr: Expression): BGEXExpression => {
                 name: expr.name
             }
         case "Literal":
-            if(/^\d+$/.test(expr.raw??"")){    
-                const value = parseInt(expr.raw ?? "");
-
-                return {
-                    type: BGEXExpressionType.num,
-                    num: value,
-                    isbig: false
-                }
-            }else if(/^\d+n$/.test(expr.raw??"")){
+            const num = parseInt(expr.raw??"");
+            if(/^\d+n$/.test(expr.raw??"")){
                 const value = parseInt(expr.raw ?? "");
 
                 return {
@@ -58,10 +51,15 @@ export const parseExpression = (expr: Expression): BGEXExpression => {
                     num: value,
                     isbig: true
                 }
-            }else{
+            }else if(Number.isInteger(num)){    
+                return {
+                    type: BGEXExpressionType.num,
+                    num,
+                    isbig: false
+                }
+            }else {
                 throw SyntaxError(`${expr.raw} is not number`);
             }
-            break;
         case "BinaryExpression":
             return {
                 type: BGEXExpressionType.binary,
