@@ -8,8 +8,11 @@ export const compileFunc = (scope: BGEXScope,token: BGEXFunction, name?: string)
     const n = name ?? token.name;
     const args = token.args.map(useVariable);
 
-    const exprs: string[] = token.statements.map(e=>compileStatement(scope, e)).filter(e=>e!==undefined);
     scope.vars.push(new Map);
+    args.forEach(e=>scope.vars.at(-1)?.set(e[1], e));
+
+    const exprs: string[] = token.statements.map(e=>compileStatement(scope, e)).filter(e=>e!==undefined);
+
     scope.vars.pop();
 
     const argPoper = `; pop arguments
