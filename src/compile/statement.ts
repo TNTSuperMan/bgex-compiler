@@ -10,7 +10,7 @@ export const compileStatement = (scope: BGEXScope, token: BGEXStatement): string
             token.vars.forEach(e=>scope.vars.at(-1)?.set(e.name, parseVariable(e)));
             break;
         case BGEXStatementType.expr:
-            return compileExpression(scope, token.expr);
+            return "/ " + compileExpression(scope, token.expr);
         case BGEXStatementType.if:
             return `;if
 ;cond

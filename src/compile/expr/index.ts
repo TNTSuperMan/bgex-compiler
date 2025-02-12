@@ -16,7 +16,7 @@ const IOFunctionMap: {[key: string]: number|void} = { //関数と引数数のマ
 export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBigint?: boolean): string => {
     switch(token.type){
         case BGEXExpressionType.call:
-            const arg = `/${token.args.length?" ":""}${token.args.map(e=>compileExpression(scope, e)).join(" ")}`;
+            const arg = `${token.args.length?" ":""}${token.args.map(e=>compileExpression(scope, e)).join(" ")}`;
             const fn = scope.funcs.get(token.name);
             if(fn){
                 if(IOFunctionMap[token.name] !== token.args.length) throw new Error("Argument length not match");
@@ -29,17 +29,17 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
             const v = scope.vars.reduceRight<Variable|void>((v, c) => v || c.get(token.name), undefined);
             if(!v) throw new Error("Not found variable: " + token.name);
             if(v[0] && !isBigint) throw new Error(`${v[1]} is not normal variable`);
-            if(v[1]){
-                return `/ ${v[2].toString(16).padStart(2, "0")} ${v[3]?.toString(16).padStart(2, "0")}`
+            if(v[0]){
+                return `${v[2].toString(16).padStart(2, "0")} ${v[3]?.toString(16).padStart(2, "0")}`
             }else{
-                return `/ ${ptr2asm(v[2])} load`;
+                return `${ptr2asm(v[2])} load`;
             }
         case BGEXExpressionType.num:
             if(token.isbig){
                 if(!isBigint) throw new Error(`Cannot specify bigint to number`);
                 return "" //Bigintどうしよ♨
             }else{
-                return `/ ${token.num.toString(16).padStart(2, "0")}`
+                return token.num.toString(16).padStart(2, "0")
             }
         default:
             throw new Error("Not implemented");
