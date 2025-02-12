@@ -31,9 +31,13 @@ ${token.true.map(e=>compileStatement(scope, e)).join("\n")}
             return `;while
 :while_start_${t}
 ;cond
+/ ${compileExpression(scope, token.condition)}
+
 / :while_code_${t} truejump
 / :while_end_${t} jump
-;code
+
+${token.code.map(e=>compileStatement(scope, e)).join("\n")}
+
 / :while_start_${t} jump
 :while_end_${t}`
     }
