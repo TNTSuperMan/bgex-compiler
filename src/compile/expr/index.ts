@@ -14,7 +14,7 @@ const IOFunctionMap: {[key: string]: number|void} = { //関数と引数数のマ
 export const compileExpression = (scope: BGEXScope, token: BGEXExpression): string => {
     switch(token.type){
         case BGEXExpressionType.call:
-            const arg = `/ ${token.args.map(e=>compileExpression(scope, e)).join(" ")}`;
+            const arg = `/${token.args.length?" ":""}${token.args.map(e=>compileExpression(scope, e)).join(" ")}`;
             const fn = scope.funcs.get(token.name);
             if(fn){
                 if(IOFunctionMap[token.name] !== token.args.length) throw new Error("Argument length not match");
