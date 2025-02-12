@@ -41,8 +41,8 @@ export const compileBGEX = (token: BGEXModule, modules: BGEXModules): string => 
         fnmap.set(e.name, e.name + crypto.randomUUID()))
     fnmap.forEach((v,k)=>scope.funcs.set(k, v));
 
-    asm.push(...token.funcs.map(e => compileFunc(e, fnmap.get(e.name))))
-    asm.push(...token.exportFunctions.map(e => compileFunc(e, escapeFunction(token.path, e.name))))
+    asm.push(...token.funcs.map(e => compileFunc(scope, e, fnmap.get(e.name))))
+    asm.push(...token.exportFunctions.map(e => compileFunc(scope, e, escapeFunction(token.path, e.name))))
 
     return asm.join("\n");
 }
