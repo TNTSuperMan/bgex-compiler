@@ -3,7 +3,7 @@ import { BGEXStatementType, type BGEXStatement } from "../parse/statement";
 import { compileExpression } from "./expr";
 import { parseVariable } from "./var";
 
-export const compileStatements = (scope: BGEXScope, token: BGEXStatement) => {
+export const compileStatement = (scope: BGEXScope, token: BGEXStatement) => {
     const t = crypto.randomUUID();
     switch(token.type){
         case BGEXStatementType.var:
