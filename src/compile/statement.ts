@@ -14,11 +14,18 @@ export const compileStatement = (scope: BGEXScope, token: BGEXStatement): string
         case BGEXStatementType.if:
             return `;if
 ;cond
+/ ${compileExpression(scope, token.condition)}
+
 / :if_true_${t} truejump
-; false
+;if_false_${t}
+
+${token.false?.map(e=>compileStatement(scope, e)).join("\n")}
+
 / :if_end_${t} jump
 :if_true_${t}
-; true
+
+${token.true.map(e=>compileStatement(scope, e)).join("\n")}
+
 :if_end`
         case BGEXStatementType.while:
             return `;while
