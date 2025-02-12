@@ -12,7 +12,8 @@ export const compileFunc = (scope: BGEXScope,token: BGEXFunction, name?: string)
     scope.vars.push(new Map);
     scope.vars.pop();
 
-    return`:fn_${n}
-${args.map(e=>`${ptr2asm(e[2])}`)}
+    return`:fn_${n}${!args.length ? "" : `
+; pop arguments
+${args.map(e=>`/ ${ptr2asm(e[2])} store`).join("\n")}`}
 ${exprs.join("\n")}`
 }
