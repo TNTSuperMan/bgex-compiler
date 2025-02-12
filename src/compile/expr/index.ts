@@ -19,7 +19,7 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression): stri
             if(fn){
                 if(IOFunctionMap[token.name] !== token.args.length) throw new Error("Argument length not match");
                 return `${arg} ${fn} call`;
-            }else if(IOFunctionMap[token.name]){
+            }else if(IOFunctionMap[token.name] !== undefined){
                 if(IOFunctionMap[token.name] !== token.args.length) throw new Error("Argument length not match");
                 return `${arg} ${token.name}`;
             }else throw new Error("Not found function: " + token.name)
