@@ -34,6 +34,13 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
             }else{
                 return `/ ${ptr2asm(v[2])} load`;
             }
+        case BGEXExpressionType.num:
+            if(token.isbig){
+                if(!isBigint) throw new Error(`Cannot specify bigint to number`);
+                return "" //Bigintどうしよ♨
+            }else{
+                return `/ ${token.num.toString(16).padStart(2, "0")}`
+            }
         default:
             throw new Error("Not implemented");
     }
