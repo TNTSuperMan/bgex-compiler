@@ -47,6 +47,13 @@ export const parseStatement = (statement: Statement): BGEXStatement[] => {
                 type: BGEXStatementType.var,
                 vars: parseVariable(statement)
             }]
+        case "IfStatement":
+            return[{
+                type: BGEXStatementType.if,
+                condition: parseExpression(statement.test),
+                true: parseStatement(statement.consequent),
+                false: statement.alternate ? parseStatement(statement.alternate) : undefined
+            }]
         default:
             return serr(`${statement.type} is not supported`, statement.start);
     }
