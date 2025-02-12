@@ -4,7 +4,7 @@ import { BGEXStatementType } from "../parse/statement";
 import { ptr2asm } from "./util";
 import { parseVariable, useVariable } from "./var";
 
-export const compileFunc = (scope: BGEXScope,token: BGEXFunction, name?: string) => {
+export const compileFunc = (scope: BGEXScope,token: BGEXFunction, name?: string): string => {
     const n = name ?? token.name;
     const args = token.args.map(useVariable);
 
