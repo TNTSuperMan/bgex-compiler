@@ -51,7 +51,8 @@ export const parseExpression = (expr: Expression): BGEXExpression => {
                     num: value,
                     isbig: true
                 }
-            }else if(Number.isInteger(num)){    
+            }else if(Number.isInteger(num)){
+                if(num > 0xff) throw new SyntaxError(`${num} is Too big number`)
                 return {
                     type: BGEXExpressionType.num,
                     num,
