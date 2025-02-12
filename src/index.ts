@@ -12,6 +12,7 @@ export const BGEXCompile = (source: string) => {
         if(!importlist.has(sp)){
             const token = parseBGEX(sp);
             if(!token) return;
+            importlist.set(sp, token);
             pathStack.push(...token.imports.map(e=>e.path));
         }
     const exports: Map<string, Exports> = new Map;
