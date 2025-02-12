@@ -54,6 +54,12 @@ export const parseStatement = (statement: Statement): BGEXStatement[] => {
                 true: parseStatement(statement.consequent),
                 false: statement.alternate ? parseStatement(statement.alternate) : undefined
             }]
+        case "WhileStatement":
+            return[{
+                type: BGEXStatementType.while,
+                condition: parseExpression(statement.test),
+                code: parseStatement(statement.body)
+            }]
         default:
             return serr(`${statement.type} is not supported`, statement.start);
     }
