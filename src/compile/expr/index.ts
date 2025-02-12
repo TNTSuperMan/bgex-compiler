@@ -1,5 +1,7 @@
 import type { BGEXScope } from "..";
 import { BGEXExpressionType, type BGEXExpression } from "../../parse/expr";
+import { ptr2asm } from "../util";
+import type { Variable } from "../var";
 
 const IOFunctionMap: {[key: string]: number|void} = { //関数と引数数のマップ
     dumpkey: 0,
@@ -11,7 +13,7 @@ const IOFunctionMap: {[key: string]: number|void} = { //関数と引数数のマ
     io: 1
 }
 
-export const compileExpression = (scope: BGEXScope, token: BGEXExpression): string => {
+export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBigint?: boolean): string => {
     switch(token.type){
         case BGEXExpressionType.call:
             const arg = `/${token.args.length?" ":""}${token.args.map(e=>compileExpression(scope, e)).join(" ")}`;
@@ -23,7 +25,15 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression): stri
                 if(IOFunctionMap[token.name] !== token.args.length) throw new Error("Argument length not match");
                 return `${arg} ${token.name}`;
             }else throw new Error("Not found function: " + token.name)
-            break;
+        case BGEXExpressionType.var:
+            const v = scope.vars.reduceRight<Variable|void>((v, c) => v || c.get(token.name), undefined);
+            if(!v) throw new Error("Not found variable: " + token.name);
+            if(v[0] && !isBigint) throw new Error(`${v[1]} is not normal variable`);
+            if(v[1]){
+                return `/ ${v[2].toString(16).padStart(2, "0")} ${v[3]?.toString(16).padStart(2, "0")}`
+            }else{
+                return `/ ${ptr2asm(v[2])} load`;
+            }
         default:
             throw new Error("Not implemented");
     }
