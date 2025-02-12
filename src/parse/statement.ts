@@ -28,23 +28,24 @@ export type BGEXStatement = {
 }
 
 export const parseStatement = (statement: Statement): BGEXStatement => {
-    if(statement.type == "ExpressionStatement"){
-        switch(statement.expression.type){
-            case "CallExpression":
-            case "AssignmentExpression":
-                return{
-                    type: BGEXStatementType.expr,
-                    expr: parseExpression(statement.expression)
-                }
-            default:
-                return serr(`${statement.expression.type} is not statement`, statement.expression.start);
-        }
-    }else if(statement.type == "VariableDeclaration"){
-        return{
-            type: BGEXStatementType.var,
-            vars: parseVariable(statement)
-        }
-    }else{
-        return serr(`${statement.type} is not supported`, statement.start);
+    switch(statement.type){
+        case "ExpressionStatement":
+            switch(statement.expression.type){
+                case "CallExpression":
+                case "AssignmentExpression":
+                    return{
+                        type: BGEXStatementType.expr,
+                        expr: parseExpression(statement.expression)
+                    }
+                default:
+                    return serr(`${statement.expression.type} is not statement`, statement.expression.start);
+            }
+        case "VariableDeclaration":
+            return{
+                type: BGEXStatementType.var,
+                vars: parseVariable(statement)
+            }
+        default:
+            return serr(`${statement.type} is not supported`, statement.start);
     }
 }
