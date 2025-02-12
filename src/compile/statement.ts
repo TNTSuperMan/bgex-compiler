@@ -29,7 +29,6 @@ export const compileStatement = (scope: BGEXScope, token: BGEXStatement): string
 / :while_end_${t} jump
 ;code
 / :while_start_${t} jump
-:while_end_${t}
-`
+:while_end_${t}`
     }
 }
