@@ -11,7 +11,6 @@ export const compileStatement = (scope: BGEXScope, token: BGEXStatement): string
             break;
         case BGEXStatementType.expr:
             return compileExpression(scope, token.expr);
-            break;
         case BGEXStatementType.if:
             return `;if
 ;cond
