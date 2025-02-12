@@ -9,7 +9,7 @@ export type BGEXModules = Map<string, (
 )[]>;
 
 export type BGEXScope = {
-    vars: Map<string, Variable>,
+    vars: Map<string, Variable>[],
     funcs: Map<string, string>
 }
 
@@ -17,7 +17,7 @@ export const compileBGEX = (token: BGEXModule, modules: BGEXModules): string => 
     let asm = [`;${token.path}`];
     
     const scope: BGEXScope = {
-        vars: new Map, funcs: new Map };
+        vars:[new Map], funcs: new Map };
     
     token.imports.forEach(e=>{
         const m = modules.get(e.path);
@@ -28,13 +28,13 @@ export const compileBGEX = (token: BGEXModule, modules: BGEXModules): string => 
             if(v[0]){
                 scope.funcs.set(t[1], v[2]);
             }else{
-                scope.vars.set(t[1], v[2]);
+                scope.vars[0].set(t[1], v[2]);
             }
         })
     })
 
     const vars: Variable[] = token.vars.map(parseVariable);
-    vars.forEach(e=>scope.vars.set(e[1], e));
+    vars.forEach(e=>scope.vars[0].set(e[1], e));
 
     const fnmap: Map<string, string> = new Map;
     token.funcs.forEach(e=>
