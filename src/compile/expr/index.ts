@@ -47,6 +47,11 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
             return compileBinaryExpression(scope, token.token);
         case BGEXExpressionType.unary:
             return compileUnaryExpression(scope, token.token);
+        case BGEXExpressionType.set:
+            const va = scope.vars.reduceRight<Variable|void>((v, c) => v || c.get(token.name), undefined);
+            if(!va) throw new Error("Not found variable: " + token.name);
+            if(va[0]) throw new Error(`${va[1]} is not normal variable`);
+            return `${compileExpression(scope, token.value)} ${ptr2asm(va[2])} store`;
         default:
             throw new Error("Not implemented");
     }
