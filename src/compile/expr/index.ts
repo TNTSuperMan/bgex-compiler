@@ -22,10 +22,13 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
             const arg = `${token.args.length?" ":""}${token.args.map(e=>compileExpression(scope, e)).join(" ")}`;
             const fn = scope.funcs.get(token.name);
             if(fn){
-                if(fn[3] !== token.args.length) throw new Error("Argument length not match");
+                if(fn[3] !== token.args.length)
+                    throw new Error(`Argument length not match(${fn[1]}:${fn[3]} != ${token.args.length})`);
                 return `${arg} ${fn} call`;
             }else if(IOFunctionMap[token.name] !== undefined){
-                if(!isNaN(IOFunctionMap[token.name]??0) && IOFunctionMap[token.name] !== token.args.length) throw new Error("Argument length not match");
+                if(!isNaN(IOFunctionMap[token.name]??0) &&
+                    IOFunctionMap[token.name] !== token.args.length)
+                    throw new Error(`Argument length not match(${token.name}:${IOFunctionMap[token.name]} != ${token.args.length})`);
                 return `${arg} ${token.name}`;
             }else throw new Error("Not found function: " + token.name)
         case BGEXExpressionType.var:
