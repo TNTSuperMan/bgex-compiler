@@ -9,7 +9,8 @@ export const enum BGEXExpressionType{
     binary,
     unary,
     call,
-    set
+    set,
+    logical
 }
 export type BGEXExpression = {
     type: BGEXExpressionType.var,
@@ -61,6 +62,7 @@ export const parseExpression = (expr: Expression): BGEXExpression => {
             }else {
                 throw SyntaxError(`${expr.raw} is not number`);
             }
+        case "LogicalExpression":
         case "BinaryExpression":
             return {
                 type: BGEXExpressionType.binary,

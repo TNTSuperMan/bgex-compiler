@@ -39,6 +39,12 @@ export const compileBinaryExpression = (scope: BGEXScope, token: BGEXBinaryExpre
         case"^": return bit.xor(
             compileExpression(scope, token.left),
             compileExpression(scope, token.right));
+        case"&&": return and(
+            compileExpression(scope, token.left),
+            compileExpression(scope, token.right));
+        case"||": return or(
+            compileExpression(scope, token.left),
+            compileExpression(scope, token.right));
         default: throw new Error("Not implemented binary expression: " + token.type)
     }
 }
