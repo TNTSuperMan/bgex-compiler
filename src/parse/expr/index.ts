@@ -35,7 +35,7 @@ export type BGEXExpression = {
     value: BGEXExpression
 }
 
-export const parseExpression = (expr: Expression): BGEXExpression => {
+export const parseExpression = (expr: Expression, isGlobal?: boolean | number): BGEXExpression => {
     switch(expr.type){
         case "Identifier":
             return {
@@ -84,6 +84,7 @@ export const parseExpression = (expr: Expression): BGEXExpression => {
                 }
             }else return serr(`Cannot call ${expr.callee.type}`, expr.start)
         case "AssignmentExpression":
+            if(!isGlobal) return serr(`Cannot assign at not global`, expr.start);
             return {
                 type: BGEXExpressionType.set,
                 name: expr.left.type == "Identifier" ? expr.left.name :
