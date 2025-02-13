@@ -56,6 +56,9 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
             if(!va) throw new Error("Not found variable: " + token.name);
             if(va[0]) throw new Error(`${va[1]} is not normal variable`);
             return `${compileExpression(scope, token.value)} ${ptr2asm(va[2])} store`;
+        case BGEXExpressionType.macro:
+            if(!scope.macro) throw new Error("Macro is not defined");
+            return scope.macro(scope, ...token.args);
         default:
             throw new Error("Not implemented");
     }

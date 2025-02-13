@@ -1,4 +1,4 @@
-import type { Expression } from "acorn"
+import type { Expression, SpreadElement } from "acorn"
 import { parseBinaryExpression, type BGEXBinaryExpression } from "./binary"
 import { parseUnaryExpression, type BGEXUnaryExpression } from "./unary"
 import { serr } from "../../util"
@@ -10,7 +10,7 @@ export const enum BGEXExpressionType{
     unary,
     call,
     set,
-    logical
+    macro
 }
 export type BGEXExpression = {
     type: BGEXExpressionType.var,
@@ -33,6 +33,9 @@ export type BGEXExpression = {
     type: BGEXExpressionType.set,
     name: string,
     value: BGEXExpression
+} | {
+    type: BGEXExpressionType.macro,
+    args: (Expression|SpreadElement)[]
 }
 
 export const parseExpression = (expr: Expression, isGlobal?: boolean | number): BGEXExpression => {
@@ -75,6 +78,10 @@ export const parseExpression = (expr: Expression, isGlobal?: boolean | number): 
             }
         case "CallExpression":
             if(expr.callee.type === "Identifier"){
+                if(expr.callee.name == "$") return {
+                    type: BGEXExpressionType.macro,
+                    args: expr.arguments
+                }
                 return {
                     type: BGEXExpressionType.call,
                     name: expr.callee.name,

@@ -3,13 +3,15 @@ import { parseBGEX, type BGEXModule } from "./parse"
 import { toExportiveToken, type Exports } from "./exportive";
 import { compileBGEX } from "./compile";
 
-export const BGEXCompile = (source: string) => {
+export type { MacroType } from "./parse/index"
+
+export const BGEXCompile = async(source: string) => {
     const importlist: Map<string, BGEXModule> = new Map;
     const absSP = resolve(process.cwd(), source);
     const pathStack: string[] = [absSP];
     for(let sp = absSP; pathStack.length; sp = pathStack.pop()??"")
         if(sp && !importlist.has(sp)){
-            const token = parseBGEX(sp);
+            const token = await parseBGEX(sp);
             if(!token) return;
             importlist.set(sp, token);
             pathStack.push(...token.imports.map(e=>e.path));

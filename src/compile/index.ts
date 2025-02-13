@@ -1,5 +1,5 @@
 import { toExportiveFunction, type Exports, type FunctionExport } from "../exportive";
-import type { BGEXModule } from "../parse";
+import type { BGEXModule, MacroType } from "../parse";
 import type { BGEXFunction } from "../parse/func";
 import { compileFunc } from "./func";
 import { escapeFunction } from "./util";
@@ -7,14 +7,15 @@ import { parseVariable, type Variable } from "./var";
 
 export type BGEXScope = {
     vars: Map<string, Variable>[],
-    funcs: Map<string, FunctionExport>
+    funcs: Map<string, FunctionExport>,
+    macro?: MacroType
 }
 
 export const compileBGEX = (token: BGEXModule, exports: Map<string, Exports>): string => {
     let asm = [`;@@ ${token.path}`];
     
     const scope: BGEXScope = {
-        vars:[new Map], funcs: new Map };
+        vars:[new Map], funcs: new Map, macro: token.macro };
     
     token.imports.forEach(e=>{
         const m = exports.get(e.path);

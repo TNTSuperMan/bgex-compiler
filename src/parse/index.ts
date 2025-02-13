@@ -1,9 +1,12 @@
-import { parse } from "acorn"
+import { parse, type Expression, type SpreadElement } from "acorn"
 import { existsSync, readFileSync } from "node:fs"
 import { dirname, resolve } from "node:path"
 import { serr } from "../util"
 import { parseFunction, type BGEXFunction } from "./func"
 import { parseVariable, type BGEXVar } from "./var"
+import type { BGEXScope } from "../compile"
+
+export type MacroType = (scope: BGEXScope, ...args: (Expression|SpreadElement)[]) => string;
 
 export type BGEXModule = {
     path: string,
@@ -14,10 +17,11 @@ export type BGEXModule = {
         specifiers: [string, string][]
     }[],
     exportFunctions: BGEXFunction[],
-    exportVariables: BGEXVar[]
+    exportVariables: BGEXVar[],
+    macro?: MacroType
 }
 
-export const parseBGEX = (path: string): BGEXModule | undefined => {
+export const parseBGEX = async(path: string): Promise<BGEXModule | undefined> => {
     if(!existsSync(path)) throw new Error(`${path} not found`)
     const src = readFileSync(path).toString()
     const token = parse(src, {ecmaVersion: "latest", sourceType: "module"});
@@ -30,8 +34,9 @@ export const parseBGEX = (path: string): BGEXModule | undefined => {
         const exportVariables: BGEXVar[] = [];
         const funcs: BGEXFunction[] = [];
         const vars: BGEXVar[] = [];
+        const macro: MacroType[] = [];
 
-        token.body.forEach(e=>{
+        await Promise.all(token.body.map(async e=>{
             switch(e.type){
                 case "FunctionDeclaration":
                     funcs.push(parseFunction(e));
@@ -44,20 +49,24 @@ export const parseBGEX = (path: string): BGEXModule | undefined => {
                     if(typeof p == "string"){
                         const fullp = resolve(dirname(path), p)
                         if(!existsSync(fullp)) return serr(`Not found module: ${fullp}`, e.start);
-                        imports.push({
-                            path: fullp,
-                            specifiers: e.specifiers.map(e=>{
-                                if(e.type == "ImportSpecifier"){
-                                    if(e.imported.type == "Identifier"){
-                                        return [e.imported.name, e.local.name]
+                        if(e.specifiers.length){
+                            imports.push({
+                                path: fullp,
+                                specifiers: e.specifiers.map(e=>{
+                                    if(e.type == "ImportSpecifier"){
+                                        if(e.imported.type == "Identifier"){
+                                            return [e.imported.name, e.local.name]
+                                        }else{
+                                            return serr(`Cannot import ${e.imported.type} value`, e.start);
+                                        }
                                     }else{
-                                        return serr(`Cannot import ${e.imported.type} value`, e.start);
+                                        return serr(`Cannot import ${e.type}`, e.start);
                                     }
-                                }else{
-                                    return serr(`Cannot import ${e.type}`, e.start);
-                                }
+                                })
                             })
-                        })
+                        }else{
+                            macro.push((await import(fullp)).default);
+                        }
                     }
                     break;
                 case "ExportNamedDeclaration":
@@ -76,8 +85,8 @@ export const parseBGEX = (path: string): BGEXModule | undefined => {
                 default:
                     return serr(`${e.type} is not supported`, e.start)
             }
-        })
-        return {path, imports, funcs, vars, exportFunctions, exportVariables}
+        }));
+        return {path, imports, funcs, vars, exportFunctions, exportVariables, macro: macro.at(-1)}
     }catch(e){
         if(e instanceof SyntaxError){
             if(typeof e.cause == "number"){
