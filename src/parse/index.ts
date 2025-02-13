@@ -45,7 +45,7 @@ export const parseBGEX = (path: string): BGEXModule | undefined => {
                         const fullp = resolve(dirname(path), p)
                         if(!existsSync(fullp)) return serr(`Not found module: ${fullp}`, e.start);
                         imports.push({
-                            path: p,
+                            path: fullp,
                             specifiers: e.specifiers.map(e=>{
                                 if(e.type == "ImportSpecifier"){
                                     if(e.imported.type == "Identifier"){
