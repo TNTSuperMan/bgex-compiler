@@ -3,6 +3,7 @@ import { BGEXExpressionType, type BGEXExpression } from "../../parse/expr";
 import { ptr2asm } from "../util";
 import type { Variable } from "../var";
 import { compileBinaryExpression } from "./binary";
+import { compileUnaryExpression } from "./unary";
 
 const IOFunctionMap: {[key: string]: number|void} = { //関数と引数数のマップ
     dumpkey: 0,
@@ -44,6 +45,8 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
             }
         case BGEXExpressionType.binary:
             return compileBinaryExpression(scope, token.token);
+        case BGEXExpressionType.unary:
+            return compileUnaryExpression(scope, token.token);
         default:
             throw new Error("Not implemented");
     }

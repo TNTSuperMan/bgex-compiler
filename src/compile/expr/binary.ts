@@ -2,15 +2,15 @@ import { compileExpression } from ".";
 import type { BGEXScope } from "..";
 import type { BGEXBinaryExpression } from "../../parse/expr/binary";
 
-const boolify = " 2 rem";
-const not = " 1 add";
+export const boolify = " 2 rem";
+export const not = " 1 add";
 const and = (a: string, b: string) => `${a}${boolify} ${b}${boolify} add 1 greater`;
 const or = (a: string, b: string) => `${a}${boolify} ${b}${boolify} add 0 greater`;
 
-const bitNot = (a: string) => `${a} ${a} nand`;
+export const bitNot = (a: string) => `${a} ${a} nand`;
 const nand = (a:string,b:string) => `${a} ${b} nand`
 type BitKey = "and" | "or" | "xor"
-const bit: {[key in BitKey]: ((a: string, b: string) => string)} = {
+export const bit: {[key in BitKey]: ((a: string, b: string) => string)} = {
     and: (a,b) => bitNot(nand(a,b)),
     or: (a,b) => nand(bitNot(a), bitNot(b)),
     xor: (a,b) => nand(nand(a, nand(a, b)), nand(b, nand(a, b))) 
