@@ -37,7 +37,7 @@ export const parseStatements = (statement: Statement): BGEXStatement[] => {
                 case "AssignmentExpression":
                     return[{
                         type: BGEXStatementType.expr,
-                        expr: parseExpression(statement.expression)
+                        expr: parseExpression(statement.expression, true)
                     }]
                 default:
                     return serr(`${statement.expression.type} is not statement`, statement.expression.start);
