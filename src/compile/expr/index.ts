@@ -22,7 +22,7 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
             const arg = `${token.args.length?" ":""}${token.args.map(e=>compileExpression(scope, e)).join(" ")}`;
             const fn = scope.funcs.get(token.name);
             if(fn){
-                if(IOFunctionMap[token.name] !== token.args.length) throw new Error("Argument length not match");
+                if(fn[3] !== token.args.length) throw new Error("Argument length not match");
                 return `${arg} ${fn} call`;
             }else if(IOFunctionMap[token.name] !== undefined){
                 if(!isNaN(IOFunctionMap[token.name]??0) && IOFunctionMap[token.name] !== token.args.length) throw new Error("Argument length not match");
