@@ -11,7 +11,7 @@ export type BGEXScope = {
 }
 
 export const compileBGEX = (token: BGEXModule, exports: Map<string, Exports>): string => {
-    let asm = [`;${token.path}`];
+    let asm = [`;@@ ${token.path}`];
     
     const scope: BGEXScope = {
         vars:[new Map], funcs: new Map };
