@@ -1,6 +1,6 @@
 import type { Statement } from "acorn";
 import { serr } from "../util";
-import { parseExpression, type BGEXExpression } from "./expr";
+import { BGEXExpressionType, parseExpression, type BGEXExpression } from "./expr";
 import { parseVariable, type BGEXVar } from "./var";
 
 export const enum BGEXStatementType{
@@ -59,6 +59,16 @@ export const parseStatements = (statement: Statement): BGEXStatement[] => {
                 type: BGEXStatementType.while,
                 condition: parseExpression(statement.test),
                 code: parseStatements(statement.body)
+            }]
+        case "ReturnStatement":
+            const ret = statement.argument;
+            return[{
+                type: BGEXStatementType.expr,
+                expr: {
+                    type: BGEXExpressionType.call,
+                    name: "ret",
+                    args: ret ? [parseExpression(ret)] : []
+                }
             }]
         default:
             return serr(`${statement.type} is not supported`, statement.start);

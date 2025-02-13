@@ -12,7 +12,8 @@ const IOFunctionMap: {[key: string]: number|void} = { //関数と引数数のマ
     graph: 3,
     sound: 1,
     stopsound: 0,
-    io: 1
+    io: 1,
+    ret: NaN
 }
 
 export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBigint?: boolean): string => {
@@ -24,7 +25,7 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
                 if(IOFunctionMap[token.name] !== token.args.length) throw new Error("Argument length not match");
                 return `${arg} ${fn} call`;
             }else if(IOFunctionMap[token.name] !== undefined){
-                if(IOFunctionMap[token.name] !== token.args.length) throw new Error("Argument length not match");
+                if(!isNaN(IOFunctionMap[token.name]??0) && IOFunctionMap[token.name] !== token.args.length) throw new Error("Argument length not match");
                 return `${arg} ${token.name}`;
             }else throw new Error("Not found function: " + token.name)
         case BGEXExpressionType.var:
