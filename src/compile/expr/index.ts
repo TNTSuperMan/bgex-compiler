@@ -24,7 +24,7 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
             if(fn){
                 if(fn[3] !== token.args.length)
                     throw new Error(`Argument length not match(${fn[1]}:${fn[3]} != ${token.args.length})`);
-                return `${arg} ${fn[2]} call`;
+                return `${arg} :${fn[2]} call`;
             }else if(IOFunctionMap[token.name] !== undefined){
                 if(!isNaN(IOFunctionMap[token.name]??0) &&
                     IOFunctionMap[token.name] !== token.args.length)
