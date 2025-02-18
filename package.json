@@ -1,6 +1,8 @@
 {
   "name": "bgex-compiler",
-  "module": "index.ts",
+  "module": "./dist/index.js",
+  "main": "./dist/index.js",
+  "types": "./index.ts",
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest",
