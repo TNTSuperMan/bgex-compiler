@@ -24,7 +24,7 @@ ${token.false?.map(e=>compileStatement(scope, e)).join("\n")}
 
 ${token.true.map(e=>compileStatement(scope, e)).join("\n")}
 
-:if_end`
+:if_end_${t}`
         case BGEXStatementType.while:
             return `;while
 :while_start_${t}
