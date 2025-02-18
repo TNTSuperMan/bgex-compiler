@@ -1,0 +1,7 @@
+node_modules
+playground
+.gitignore
+.npmignore
+build.ts
+bun.lock
+tsconfig.json
