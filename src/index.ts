@@ -6,7 +6,7 @@ import { assemble } from "./assemble";
 
 export type { MacroType } from "./parse/index"
 
-export const BGEXCompile = async (source: string): Promise<[string, number[]]|void> => {
+export const BGEXCompile = async (source: string): Promise<[string, number[]?]|void> => {
     const importlist: Map<string, BGEXModule> = new Map;
     const absSP = resolve(process.cwd(), source);
     const pathStack: string[] = [absSP];
@@ -23,7 +23,11 @@ export const BGEXCompile = async (source: string): Promise<[string, number[]]|vo
     const results = importlist.values().map(e=>compileBGEX(e, exports));
     const assembly = Array.from(results).join("\n\n");
 
-    const binary = assemble(assembly);
-
-    return [assembly, binary]
+    try{
+        const binary = assemble(assembly);
+        return [assembly, binary];
+    }catch(e){
+        console.error(e);
+        return [assembly];
+    }
 }
