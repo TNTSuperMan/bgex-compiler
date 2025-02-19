@@ -32,7 +32,8 @@ export type BGEXExpression = {
 } | {
     type: BGEXExpressionType.set,
     name: string,
-    value: BGEXExpression
+    value: BGEXExpression,
+    opr: "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "|=" | "^=" | "&=" | "||=" | "&&="
 } | {
     type: BGEXExpressionType.macro,
     args: (Expression|SpreadElement)[]
@@ -92,11 +93,17 @@ export const parseExpression = (expr: Expression, isGlobal?: boolean | number): 
             }else return serr(`Cannot call ${expr.callee.type}`, expr.start)
         case "AssignmentExpression":
             if(isGlobal !== true) return serr(`Cannot assign at not global`, expr.start);
-            return {
-                type: BGEXExpressionType.set,
-                name: expr.left.type == "Identifier" ? expr.left.name :
-                serr(`${expr.left.type} variable is not supported`, expr.left.start),
-                value: parseExpression(expr.right)
+            switch(expr.operator){
+                case"**=":case"<<=":case">>=":case">>>=":case"??=":
+                    return serr(`${expr.operator} assign is not supported`, expr.start);
+                default:
+                    return {
+                        type: BGEXExpressionType.set,
+                        name: expr.left.type == "Identifier" ? expr.left.name :
+                        serr(`${expr.left.type} variable is not supported`, expr.left.start),
+                        value: parseExpression(expr.right),
+                        opr: expr.operator
+                    }
             }
         default:
             return serr(`${expr.type} is not supported expression`, expr.start)
