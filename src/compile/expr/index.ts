@@ -85,11 +85,10 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
             else
                 if(token.opr == "="){
                     const value = compileExpression(scope, token.value, true);
-                    if(value.startsWith("!")){
+                    if(value.startsWith("!"))
                         return `${value.substring(1)} ${ptr2asm(va[3])} store ${ptr2asm(va[2])} store`;
-                    }else{
+                    else
                         return `0 ${ptr2asm(va[2])} store ${value} ${ptr2asm(va[3])} store`
-                    }
                 }else throw new Error(`${token.opr} is not implemented`)
         case BGEXExpressionType.macro:
             if(!scope.macro) throw new Error("Macro is not defined");
