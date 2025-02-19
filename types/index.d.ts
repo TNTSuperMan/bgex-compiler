@@ -5,3 +5,9 @@ declare function graph(id: number, x: number, y: number): void;
 declare function sound(id: number): void;
 declare function stopsound(): void;
 declare function io(id: 0 | 1 | 2 | 3): void;
+declare interface BigInt{
+    au: number;
+    ad: number;
+    vu: number;
+    vd: number;
+}
