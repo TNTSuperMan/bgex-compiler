@@ -57,7 +57,7 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
         case BGEXExpressionType.num:
             if(token.isbig){
                 if(!isBigint) throw new Error(`Cannot specify bigint to number`);
-                return "" //Bigintどうしよ♨
+                return `!${Math.floor(token.num/256).toString(16).padStart(2, "0")} ${(token.num%256).toString(16).padStart(2, "0")}`
             }else{
                 return token.num.toString(16).padStart(2, "0")
             }
@@ -68,20 +68,29 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
         case BGEXExpressionType.set:
             const va = scope.vars.reduceRight<Variable|void>((v, c) => v || c.get(token.name), undefined);
             if(!va) throw new Error("Not found variable: " + token.name);
-            if(va[0]) throw new Error(`${va[1]} is not normal variable`);
-            if(token.opr == "=")
-                return `${compileExpression(scope, token.value)} ${ptr2asm(va[2])} store`;
-            else return `${compileExpression(scope, {
-                type: BGEXExpressionType.binary,
-                token: {
-                    type: AssignmentMap[token.opr],
-                    left: {
-                        type: BGEXExpressionType.var,
-                        name: token.name
-                    },
-                    right: token.value
-                }
-            })} ${ptr2asm(va[2])} store`;
+            if(!va[0])
+                if(token.opr == "=")
+                    return `${compileExpression(scope, token.value)} ${ptr2asm(va[2])} store`;
+                else return `${compileExpression(scope, {
+                    type: BGEXExpressionType.binary,
+                    token: {
+                        type: AssignmentMap[token.opr],
+                        left: {
+                            type: BGEXExpressionType.var,
+                            name: token.name
+                        },
+                        right: token.value
+                    }
+                })} ${ptr2asm(va[2])} store`;
+            else
+                if(token.opr == "="){
+                    const value = compileExpression(scope, token.value, true);
+                    if(value.startsWith("!")){
+                        return `${value} ${ptr2asm(va[2])} ${ptr2asm(va[3])} store store`;
+                    }else{
+                        return `0 ${ptr2asm(va[2])} store ${value} ${ptr2asm(va[3])} store`
+                    }
+                }else throw new Error(`${token.opr} is not implemented`)
         case BGEXExpressionType.macro:
             if(!scope.macro) throw new Error("Macro is not defined");
             return scope.macro(scope, ...token.args);
