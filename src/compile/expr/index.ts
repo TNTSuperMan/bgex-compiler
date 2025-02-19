@@ -86,7 +86,7 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
                 if(token.opr == "="){
                     const value = compileExpression(scope, token.value, true);
                     if(value.startsWith("!")){
-                        return `${value} ${ptr2asm(va[2])} ${ptr2asm(va[3])} store store`;
+                        return `${value.substring(1)} ${ptr2asm(va[2])} ${ptr2asm(va[3])} store store`;
                     }else{
                         return `0 ${ptr2asm(va[2])} store ${value} ${ptr2asm(va[3])} store`
                     }
