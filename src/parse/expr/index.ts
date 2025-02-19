@@ -12,6 +12,7 @@ export const enum BGEXExpressionType{
     set,
     macro
 }
+export type BGEXAssignmentOperator = "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "|=" | "^=" | "&=" | "||=" | "&&=";
 export type BGEXExpression = {
     type: BGEXExpressionType.var,
     name: string
@@ -33,7 +34,7 @@ export type BGEXExpression = {
     type: BGEXExpressionType.set,
     name: string,
     value: BGEXExpression,
-    opr: "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "|=" | "^=" | "&=" | "||=" | "&&="
+    opr: BGEXAssignmentOperator
 } | {
     type: BGEXExpressionType.macro,
     args: (Expression|SpreadElement)[]
