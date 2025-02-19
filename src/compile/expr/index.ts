@@ -1,5 +1,6 @@
 import type { BGEXScope } from "..";
-import { BGEXExpressionType, type BGEXExpression } from "../../parse/expr";
+import { BGEXExpressionType, type BGEXAssignmentOperator, type BGEXExpression } from "../../parse/expr";
+import type { BGEXBinaryExpressionType } from "../../parse/expr/binary";
 import { ptr2asm } from "../util";
 import type { Variable } from "../var";
 import { compileBinaryExpression } from "./binary";
@@ -14,6 +15,19 @@ const IOFunctionMap: {[key: string]: number|void} = { //関数と引数数のマ
     stopsound: 0,
     io: 1,
     ret: NaN
+}
+const AssignmentMap: {[key in BGEXAssignmentOperator]: BGEXBinaryExpressionType} = {
+    "=": "==",
+    "+=":"+",
+    "-=":"-",
+    "*=":"*",
+    "/=":"/",
+    "%=":"%",
+    "&=":"&",
+    "^=":"^",
+    "|=":"|",
+    "&&=":"&&",
+    "||=":"||",
 }
 
 export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBigint?: boolean): string => {
@@ -55,7 +69,19 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
             const va = scope.vars.reduceRight<Variable|void>((v, c) => v || c.get(token.name), undefined);
             if(!va) throw new Error("Not found variable: " + token.name);
             if(va[0]) throw new Error(`${va[1]} is not normal variable`);
-            return `${compileExpression(scope, token.value)} ${ptr2asm(va[2])} store`;
+            if(token.opr == "=")
+                return `${compileExpression(scope, token.value)} ${ptr2asm(va[2])} store`;
+            else return `${compileExpression(scope, {
+                type: BGEXExpressionType.binary,
+                token: {
+                    type: AssignmentMap[token.opr],
+                    left: {
+                        type: BGEXExpressionType.var,
+                        name: token.name
+                    },
+                    right: token.value
+                }
+            })} ${ptr2asm(va[2])} store`;
         case BGEXExpressionType.macro:
             if(!scope.macro) throw new Error("Macro is not defined");
             return scope.macro(scope, ...token.args);
