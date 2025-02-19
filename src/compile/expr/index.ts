@@ -48,9 +48,9 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
         case BGEXExpressionType.var:
             const v = scope.vars.reduceRight<Variable|void>((v, c) => v || c.get(token.name), undefined);
             if(!v) throw new Error("Not found variable: " + token.name);
-            if(v[0] && !isBigint) throw new Error(`${v[1]} is not normal variable`);
             if(v[0]){
-                return `${v[2].toString(16).padStart(2, "0")} ${v[3]?.toString(16).padStart(2, "0")}`
+                if(!isBigint) throw new Error(`${v[1]} is not normal variable`);
+                return `${ptr2asm(v[2])} load ${ptr2asm(v[3])} load`
             }else{
                 return `${ptr2asm(v[2])} load`;
             }
