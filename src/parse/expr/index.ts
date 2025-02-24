@@ -10,7 +10,8 @@ export const enum BGEXExpressionType{
     unary,
     call,
     set,
-    macro
+    macro,
+    biprop
 }
 export type BGEXAssignmentOperator = "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "|=" | "^=" | "&=" | "||=" | "&&=";
 export type BGEXExpression = {
@@ -38,6 +39,11 @@ export type BGEXExpression = {
 } | {
     type: BGEXExpressionType.macro,
     args: (Expression|SpreadElement)[]
+} | {
+    type: BGEXExpressionType.biprop,
+    name: string,
+    at: 0 | 1,
+    ret: "pointer" | "value"
 }
 
 export const parseExpression = (expr: Expression, isGlobal?: boolean | number): BGEXExpression => {
@@ -105,6 +111,29 @@ export const parseExpression = (expr: Expression, isGlobal?: boolean | number): 
                         value: parseExpression(expr.right),
                         opr: expr.operator
                     }
+            }
+        case "MemberExpression":
+            const target = expr.object;
+            if(target.type == "Identifier"){
+                const name = target.name;
+                if(expr.property.type == "Identifier"){
+                    switch(expr.property.name){
+                        case "ua":
+                            return {type:BGEXExpressionType.biprop,name,at:0,ret:"pointer"}
+                        case "uv":
+                            return {type:BGEXExpressionType.biprop,name,at:0,ret:"value"}
+                        case "da":
+                            return {type:BGEXExpressionType.biprop,name,at:1,ret:"pointer"}
+                        case "dv":
+                            return {type:BGEXExpressionType.biprop,name,at:1,ret:"value"}
+                        default:
+                            return serr(`${expr.property.name} is not supported property`, expr.property.start)
+                    }
+                }else{
+                    return serr(`${expr.property.type} is not supported property type`, expr.property.start)
+                }
+            }else{
+                return serr(`${expr.object.type} is not bigint var`, expr.object.start);
             }
         default:
             return serr(`${expr.type} is not supported expression`, expr.start)
