@@ -93,6 +93,11 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
         case BGEXExpressionType.macro:
             if(!scope.macro) throw new Error("Macro is not defined");
             return scope.macro(scope, ...token.args);
+        case BGEXExpressionType.biprop:
+            const vab = scope.vars.reduceRight<Variable|void>((v, c) => v || c.get(token.name), undefined);
+            if(!vab) throw new Error("Not found variable: " + token.name);
+            if(!vab[0]) throw new Error(token.name + " is not bigint variable");
+            return ptr2asm(token.at?vab[3]:vab[2]) + (token.ret == "value" ? " load" : "")
         default:
             throw new Error("Not implemented");
     }
