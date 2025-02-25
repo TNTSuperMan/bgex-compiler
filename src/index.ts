@@ -4,6 +4,7 @@ import { toExportiveFunction, toExportiveToken, type Exports } from "./exportive
 import { compileBGEX } from "./compile";
 import { assemble } from "./assemble";
 import { escapeFunction } from "./compile/util";
+import { lib } from "./compile/stdlib";
 
 export type { MacroType } from "./parse/index"
 
@@ -26,7 +27,7 @@ export const BGEXCompile = async (source: string, entrypoint: string): Promise<[
 / :fn_${escapeFunction(absSP, entrypoint)} call
 / ret
 
-` + Array.from(results).join("\n\n");
+` + lib + Array.from(results).join("\n\n");
 
     try{
         const binary = assemble(assembly);
