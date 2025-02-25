@@ -1,12 +1,13 @@
 import { resolve } from "node:path";
 import { parseBGEX, type BGEXModule } from "./parse"
-import { toExportiveToken, type Exports } from "./exportive";
+import { toExportiveFunction, toExportiveToken, type Exports } from "./exportive";
 import { compileBGEX } from "./compile";
 import { assemble } from "./assemble";
+import { escapeFunction } from "./compile/util";
 
 export type { MacroType } from "./parse/index"
 
-export const BGEXCompile = async (source: string): Promise<[string, number[]?]|void> => {
+export const BGEXCompile = async (source: string, entrypoint: string): Promise<[string, number[]?]|void> => {
     const importlist: Map<string, BGEXModule> = new Map;
     const absSP = resolve(process.cwd(), source);
     const pathStack: string[] = [absSP];
@@ -21,7 +22,11 @@ export const BGEXCompile = async (source: string): Promise<[string, number[]?]|v
     importlist.forEach(e=>exports.set(e.path, toExportiveToken(e)));
 
     const results = importlist.values().map(e=>compileBGEX(e, exports));
-    const assembly = Array.from(results).join("\n\n");
+    const assembly = `;entrypoint
+/ :fn_${escapeFunction(absSP, entrypoint)} call
+/ ret
+
+` + Array.from(results).join("\n\n");
 
     try{
         const binary = assemble(assembly);
