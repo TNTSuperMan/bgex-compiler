@@ -42,8 +42,7 @@ export type BGEXExpression = {
 } | {
     type: BGEXExpressionType.biprop,
     name: string,
-    at: 0 | 1,
-    ret: "pointer" | "value"
+    at: 0 | 1
 }
 
 export const parseExpression = (expr: Expression, isGlobal?: boolean | number): BGEXExpression => {
@@ -118,14 +117,10 @@ export const parseExpression = (expr: Expression, isGlobal?: boolean | number): 
                 const name = target.name;
                 if(expr.property.type == "Identifier"){
                     switch(expr.property.name){
-                        case "ua":
-                            return {type:BGEXExpressionType.biprop,name,at:0,ret:"pointer"}
-                        case "uv":
-                            return {type:BGEXExpressionType.biprop,name,at:0,ret:"value"}
-                        case "da":
-                            return {type:BGEXExpressionType.biprop,name,at:1,ret:"pointer"}
-                        case "dv":
-                            return {type:BGEXExpressionType.biprop,name,at:1,ret:"value"}
+                        case "top":
+                            return {type:BGEXExpressionType.biprop,name,at:0}
+                        case "bottom":
+                            return {type:BGEXExpressionType.biprop,name,at:1}
                         default:
                             return serr(`${expr.property.name} is not supported property`, expr.property.start)
                     }

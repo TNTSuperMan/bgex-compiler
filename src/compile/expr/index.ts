@@ -97,7 +97,7 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
             const vab = scope.vars.reduceRight<Variable|void>((v, c) => v || c.get(token.name), undefined);
             if(!vab) throw new Error("Not found variable: " + token.name);
             if(!vab[0]) throw new Error(token.name + " is not bigint variable");
-            return ptr2asm(token.at?vab[3]:vab[2]) + (token.ret == "value" ? " load" : "")
+            return ptr2asm(token.at?vab[3]:vab[2])+" load"
         default:
             throw new Error("Not implemented");
     }

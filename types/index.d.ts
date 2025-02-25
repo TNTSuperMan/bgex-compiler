@@ -6,8 +6,6 @@ declare function sound(id: number): void;
 declare function stopsound(): void;
 declare function io(id: 0 | 1 | 2 | 3): void;
 declare interface BigInt{
-    ua: number;
-    uv: number;
-    da: number;
-    dv: number;
+    top: number;
+    bottom: number;
 }
