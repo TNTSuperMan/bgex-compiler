@@ -89,7 +89,11 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
                         return `${value.substring(1)} ${ptr2asm(va[3])} store ${ptr2asm(va[2])} store`;
                     else
                         return `0 ${ptr2asm(va[2])} store ${value} ${ptr2asm(va[3])} store`
-                }else throw new Error(`${token.opr} is not implemented`)
+                }else if(token.opr == "+="){
+                    return `${ptr2asm(va[2])} ${ptr2asm(va[3])} ${compileExpression(scope, token.value)} :std_bigint_add call`;
+                }else if(token.opr == "-="){
+                    return `${ptr2asm(va[2])} ${ptr2asm(va[3])} ${compileExpression(scope, token.value)} :std_bigint_add call`;
+                }else throw new Error(token.opr+" is not supported bigint assignment")
         case BGEXExpressionType.macro:
             if(!scope.macro) throw new Error("Macro is not defined");
             return scope.macro(scope, ...token.args);
