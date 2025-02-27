@@ -5,4 +5,5 @@ build({
     outdir: "dist",
     minify: true,
     target: "node",
+    external: ["acorn"]
 })
