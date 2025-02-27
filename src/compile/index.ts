@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { toExportiveFunction, type Exports, type FunctionExport } from "../exportive";
 import type { BGEXModule, MacroType } from "../parse";
 import type { BGEXFunction } from "../parse/func";
@@ -8,14 +9,34 @@ import { parseVariable, type Variable } from "./var";
 export type BGEXScope = {
     vars: Map<string, Variable>[],
     funcs: Map<string, FunctionExport>,
-    macro?: MacroType
+    macro?: MacroType,
+    path: string,
+    getAt: (at: number) => [number, number]
 }
 
 export const compileBGEX = (token: BGEXModule, exports: Map<string, Exports>): string => {
     let asm = [`;@@ ${token.path}`];
+    const source = readFileSync(token.path).toString();
     
     const scope: BGEXScope = {
-        vars:[new Map], funcs: new Map, macro: token.macro };
+        vars:[new Map],
+        funcs: new Map,
+        macro: token.macro,
+        path: token.path,
+        getAt: (at) => {
+            let l = 1;
+            let c = 1;
+            for(let i = 0;i < at;i++){
+                if(source[i] == "\n"){
+                    l++
+                    c = 1;
+                }else{
+                    c++
+                }
+            }
+            return [l,c];
+        }
+    };
     
     token.imports.forEach(e=>{
         const m = exports.get(e.path);
@@ -31,7 +52,7 @@ export const compileBGEX = (token: BGEXModule, exports: Map<string, Exports>): s
         })
     })
 
-    const vars: Variable[] = token.vars.map(parseVariable);
+    const vars: Variable[] = token.vars.map(e=>parseVariable(scope, e));
     vars.forEach(e=>scope.vars[0].set(e[1], e));
 
     const fnmap: [BGEXFunction, `${string}-${string}-${string}-${string}-${string}`][] = token.funcs.map(e=>[e, crypto.randomUUID()]);

@@ -7,7 +7,7 @@ export const compileStatement = (scope: BGEXScope, token: BGEXStatement): string
     const t = crypto.randomUUID();
     switch(token.type){
         case BGEXStatementType.var:
-            token.vars.forEach(e=>scope.vars.at(-1)?.set(e.name, parseVariable(e)));
+            token.vars.forEach(e=>scope.vars.at(-1)?.set(e.name, parseVariable(scope, e)));
             break;
         case BGEXStatementType.expr:
             return "/ " + compileExpression(scope, token.expr);

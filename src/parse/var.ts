@@ -5,7 +5,8 @@ import { serr } from "../util"
 export type BGEXVar = {
     name: string,
     isbig: boolean
-    initial?: BGEXExpression
+    initial?: BGEXExpression,
+    at: number
 }
 
 
@@ -16,5 +17,6 @@ export const parseVariable = (statement: VariableDeclaration): BGEXVar[] =>
         return{
             name: t.id.type == "Identifier" ? t.id.name : serr(`${t.id.type} var define is not supported`, t.start),
             isbig: initial?.type == BGEXExpressionType.num ? initial.isbig : false,
-            initial: initial
+            initial: initial,
+            at: t.start
 }})
