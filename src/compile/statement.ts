@@ -17,7 +17,7 @@ export const compileStatement = (scope: BGEXScope, token: BGEXStatement): string
 / :if_true_${t} truejump
 ;if_false_${t}
 
-${token.false?.map(e=>compileStatement(scope, e)).join("\n")}
+${token.false?.map(e=>compileStatement(scope, e)).join("\n") ?? ";nothing"}
 
 / :if_end_${t} jump
 :if_true_${t}
