@@ -32,6 +32,7 @@ ${token.true.map(e=>compileStatement(scope, e)).join("\n")}
 / :while_code_${t} truejump
 / :while_end_${t} jump
 :while_code_${t}
+
 ${token.code.map(e=>compileStatement(scope, e)).join("\n")}
 
 / :while_start_${t} jump
