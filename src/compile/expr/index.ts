@@ -98,17 +98,7 @@ export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBig
             const bva = scope.vars.reduceRight<Variable|void>((v, c) => v || c.get(token.name), undefined);
             if(!bva) throw new Error(`Not found variable: ${token.name}`);
             if(!bva[0]) throw new Error(`Not found bigint variable: ${token.name}`);
-            return `${compileExpression(scope, {
-                    type: BGEXExpressionType.binary,
-                    token: {
-                        type: AssignmentMap[token.opr],
-                        left: {
-                            type: BGEXExpressionType.var,
-                            name: token.name
-                        },
-                        right: token.value
-                    }
-                })} ${ptr2asm(token.at ? bva[3] : bva[2])} store`;
+            return `${compileExpression(scope, token.value)} ${ptr2asm(token.at ? bva[3] : bva[2])} store`;
         case BGEXExpressionType.macro:
             if(!scope.macro) throw new Error("Macro is not defined");
             return scope.macro(scope, ...token.args);
