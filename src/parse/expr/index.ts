@@ -10,6 +10,7 @@ export const enum BGEXExpressionType{
     unary,
     call,
     set,
+    setbig,
     macro,
     biprop
 }
@@ -35,6 +36,12 @@ export type BGEXExpression = {
     type: BGEXExpressionType.set,
     name: string,
     value: BGEXExpression,
+    opr: BGEXAssignmentOperator
+} | {
+    type: BGEXExpressionType.setbig,
+    name: string,
+    at: 0 | 1,
+    value: BGEXExpression
     opr: BGEXAssignmentOperator
 } | {
     type: BGEXExpressionType.macro,
@@ -103,12 +110,29 @@ export const parseExpression = (expr: Expression, isGlobal?: boolean | number): 
                 case"**=":case"<<=":case">>=":case">>>=":case"??=":
                     return serr(`${expr.operator} assign is not supported`, expr.start);
                 default:
-                    return {
-                        type: BGEXExpressionType.set,
-                        name: expr.left.type == "Identifier" ? expr.left.name :
-                        serr(`${expr.left.type} variable is not supported`, expr.left.start),
-                        value: parseExpression(expr.right),
-                        opr: expr.operator
+                    if(expr.left.type == "Identifier"){
+                        return {
+                            type: BGEXExpressionType.set,
+                            name: expr.left.name,
+                            value: parseExpression(expr.right),
+                            opr: expr.operator
+                        }
+                    }else if(expr.left.type == "MemberExpression"){
+                        return {
+                            type: BGEXExpressionType.setbig,
+                            name: expr.left.object.type == "Identifier" ?
+                                expr.left.object.name :
+                                serr(`${expr.left.object.type} bigint is not supported`, expr.left.object.start),
+                            at: expr.left.property.type == "Identifier"?
+                                    expr.left.property.name == "top" ? 0 :
+                                        expr.left.property.name == "bottom" ? 1 :
+                                        serr(`${expr.left.property.name} is not supported bigint property`, expr.left.property.start) :
+                                serr(`${expr.left.property.type} is not supported bigint property type`, expr.left.property.start),
+                            value: parseExpression(expr.right),
+                            opr: expr.operator
+                        }
+                    }else{
+                        return serr(`${expr.left.type} variable is not supported`, expr.left.start)
                     }
             }
         case "MemberExpression":
