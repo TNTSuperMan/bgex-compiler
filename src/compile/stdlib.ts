@@ -48,5 +48,4 @@ export const lib = `; Standard library
 / a0 02 load a0 03 load store${""/*save D*/}
 
 / ret
-
 `

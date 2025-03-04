@@ -28,7 +28,9 @@ export const BGEXCompile = async (source: string, entrypoint: string, resources?
 / :fn_${escapeFunction(absSP, entrypoint)} call
 / ret
 
-` + lib + Array.from(results).join("\n\n") + (resources?.() ?? "");
+${lib}
+${Array.from(results).join("\n\n")}
+${resources?.() ?? ""}`;
 
     try{
         const binary = assemble(assembly);
