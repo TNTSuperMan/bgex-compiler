@@ -16,7 +16,7 @@ export const compileFunc = (scope: BGEXScope,token: BGEXFunction, name?: string)
     scope.vars.pop();
 
     const argPoper = `; pop arguments
-${args.map(e=>e[0] ?
+${args.toReversed().map(e=>e[0] ?
     `/ ${ptr2asm(e[3])} store ${ptr2asm(e[2])} store`:
     `/ ${ptr2asm(e[2])} store`).join("\n")}`;
 
