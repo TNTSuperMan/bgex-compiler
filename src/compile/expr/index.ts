@@ -33,7 +33,10 @@ const AssignmentMap: {[key in BGEXAssignmentOperator]: BGEXBinaryExpressionType}
 export const compileExpression = (scope: BGEXScope, token: BGEXExpression, isBigint?: boolean): string => {
     switch(token.type){
         case BGEXExpressionType.call:
-            const arg = `${token.args.length?" ":""}${token.args.map(e=>compileExpression(scope, e, true)).join(" ")}`;
+            const arg = `${token.args.length?" ":""}${token.args.map(e=>{
+                const res = compileExpression(scope, e, true);
+                return res.startsWith("!") ? res.substring(1) : res;
+            }).join(" ")}`;
             const fn = scope.funcs.get(token.name);
             if(fn){
                 if(fn[3] !== token.args.length)
