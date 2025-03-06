@@ -60,24 +60,23 @@ export const parseExpression = (expr: Expression, isGlobal?: boolean | number): 
                 name: expr.name
             }
         case "Literal":
-            const num = parseInt(expr.raw??"");
-            if(/^\d+n$/.test(expr.raw??"")){
-                const value = parseInt(expr.raw ?? "");
-
+            const value = expr.value;
+            if(typeof value == "bigint"){
+                if(value > 65535n) serr(`${value} is too big bigint number`, expr.start);
+                return {
+                    type: BGEXExpressionType.num,
+                    num: Number(value),
+                    isbig: true
+                }
+            }else if(typeof value == "number" && Number.isInteger(value)){
+                if(value > 0xff) serr(`${value} is too big number`, expr.start)
                 return {
                     type: BGEXExpressionType.num,
                     num: value,
-                    isbig: true
-                }
-            }else if(Number.isInteger(num)){
-                if(num > 0xff) throw new SyntaxError(`${num} is Too big number`)
-                return {
-                    type: BGEXExpressionType.num,
-                    num,
                     isbig: false
                 }
             }else {
-                throw SyntaxError(`${expr.raw} is not number`);
+                return serr(`${value} is not integer`, expr.start)
             }
         case "LogicalExpression":
         case "BinaryExpression":
