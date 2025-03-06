@@ -26,7 +26,3 @@ export const parseVariable = (scope: BGEXScope, vd: BGEXVar): Variable => {
         return [0, vd.name, vi++];
     }
 }
-export const useVariable = (name: string): Variable => {
-    if(vi >= 0xefff) throw new RangeError("Too many variables, count: " + vi);
-    return [0, name, vi++]
-}
