@@ -5,11 +5,12 @@ import { compileBGEX } from "./compile";
 import { assemble } from "./assemble";
 import { escapeFunction } from "./compile/util";
 import { lib } from "./compile/stdlib";
-import { varMap } from "./compile/var";
+import { initialize, varMap } from "./compile/var";
 
 export type { MacroType } from "./parse/index"
 
 export const BGEXCompile = async (source: string, entrypoint: string, resources?: () => string): Promise<[string, [number, string, string][], number[]?]|void> => {
+    initialize();
     const importlist: Map<string, BGEXModule> = new Map;
     const absSP = resolve(process.cwd(), source);
     const pathStack: string[] = [absSP];
