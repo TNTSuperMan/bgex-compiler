@@ -47,13 +47,13 @@ export const compileBGEX = (token: BGEXModule, exports: Map<string, Exports>): s
             if(res[0] == 0){
                 scope.funcs.set(res[1], res);
             }else{
-                scope.vars[0].set(res[1], res[2]);
+                scope.vars[0]?.set(res[1], res[2]);
             }
         })
     })
 
     const vars: Variable[] = token.vars.map(e=>parseVariable(scope, e));
-    vars.forEach(e=>scope.vars[0].set(e[1], e));
+    vars.forEach(e=>scope.vars[0]?.set(e[1], e));
 
     const fnmap: [BGEXFunction, `${string}-${string}-${string}-${string}-${string}`][] = token.funcs.map(e=>[e, crypto.randomUUID()]);
     fnmap.forEach(e=>scope.funcs.set(e[0].name, toExportiveFunction(e[0], e[1])))
