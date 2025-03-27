@@ -14,4 +14,6 @@ export const toExportiveFunction = (fn: BGEXFunction, path: string): FunctionExp
 
 export const toExportiveToken = (module: BGEXModule): Exports =>
     [...module.exportFunctions.map<FunctionExport>(e=>toExportiveFunction(e, module.path)),
-    ...module.exportVariables.map<VariableExport>(e=>[1, e.name, parseVariable(e)])]
+    ...module.exportVariables.map<VariableExport>(e=>[1, e.name, parseVariable({
+        vars: [], funcs: new Map, path: module.path, getAt: () => [0, 0]
+    }, e)])]
