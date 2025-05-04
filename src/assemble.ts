@@ -83,7 +83,7 @@ const tokenize = (code: string) => {
     return tokens;
 }
 
-export const assemble = (code: string): number[] => {
+export const assemble = (code: string): [number[], Map<string, number>] => {
     const tokens = tokenize(code);
     const tags = tokens.filter(e=>e.type == TokenType.Tag);
     const bins: number[] = [];
@@ -99,5 +99,5 @@ export const assemble = (code: string): number[] => {
         else if(e.type == TokenType.Inject)
             bins.push(...e.content);
     })
-    return bins;
+    return [bins, new Map(tags.map(e=>[e.name, e.at]))];
 }

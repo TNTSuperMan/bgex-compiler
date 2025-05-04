@@ -9,7 +9,7 @@ import { initialize, varMap } from "./compile/var";
 
 export type { MacroType } from "./parse/index"
 
-export const BGEXCompile = async (source: string, entrypoint: string, resources?: () => string): Promise<[string, [number, string, string][], number[]?]|void> => {
+export const BGEXCompile = async (source: string, entrypoint: string, resources?: () => string): Promise<[string, [number, string, string][], number[]?, Map<string, number>?]|void> => {
     initialize();
     const importlist: Map<string, BGEXModule> = new Map;
     const absSP = resolve(process.cwd(), source);
@@ -35,7 +35,7 @@ ${resources?.() ?? ""}`;
 
     try{
         const binary = assemble(assembly);
-        return [assembly, varMap, binary];
+        return [assembly, varMap, binary[0], binary[1]];
     }catch(e){
         console.error(e);
         return [assembly, varMap];
