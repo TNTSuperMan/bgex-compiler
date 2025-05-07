@@ -26,7 +26,7 @@ export const BGEXCompile = async (source: string, entrypoint: string, resources?
     importlist.forEach(e=>exports.set(e.path, toExportiveToken(e)));
 
     try{
-        var results = importlist.values().map(e=>compileBGEX(e, exports));
+        var results = importlist.values().toArray().map(e=>compileBGEX(e, exports));
     }catch{ return }
 
     const assembly = `;entrypoint
@@ -34,7 +34,7 @@ export const BGEXCompile = async (source: string, entrypoint: string, resources?
 / ret
 
 ${lib}
-${Array.from(results).join("\n\n")}
+${results.join("\n\n")}
 ${resources?.() ?? ""}`;
 
     try{

@@ -73,6 +73,7 @@ export const compileBGEX = (token: BGEXModule, exports: Map<string, Exports>): s
     
         return asm.join("\n");
     }catch(e){
-        throw printError(e, token.path);
+        printError(e, token.path);
+        throw new Error("Error catched")
     }
 }
