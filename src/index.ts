@@ -6,6 +6,7 @@ import { assemble } from "./assemble";
 import { escapeFunction } from "./compile/util";
 import { lib } from "./compile/stdlib";
 import { initialize, varMap } from "./compile/var";
+import { printError } from "./error";
 
 export type { MacroType } from "./parse/index"
 
@@ -24,7 +25,10 @@ export const BGEXCompile = async (source: string, entrypoint: string, resources?
     const exports: Map<string, Exports> = new Map;
     importlist.forEach(e=>exports.set(e.path, toExportiveToken(e)));
 
-    const results = importlist.values().map(e=>compileBGEX(e, exports));
+    try{
+        var results = importlist.values().map(e=>compileBGEX(e, exports));
+    }catch{ return }
+
     const assembly = `;entrypoint
 / :fn_${escapeFunction(absSP, entrypoint)} call
 / ret
@@ -37,11 +41,7 @@ ${resources?.() ?? ""}`;
         const binary = assemble(assembly);
         return [assembly, varMap, binary[0], binary[1]];
     }catch(e){
-        if(e instanceof Error){
-            if(e.cause instanceof Error)
-                console.log("Internal callstack:" + e.cause.stack);
-            console.error(`${e.name}: ${e.message}`);
-        }else throw e;
+        printError(e);
         return [assembly, varMap];
     }
 }

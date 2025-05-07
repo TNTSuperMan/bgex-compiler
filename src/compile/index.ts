@@ -5,6 +5,7 @@ import type { BGEXFunction } from "../parse/func";
 import { compileFunc } from "./func";
 import { escapeFunction } from "./util";
 import { parseVariable, type Variable } from "./var";
+import { printError } from "../error";
 
 export type BGEXScope = {
     vars: Map<string, Variable>[],
@@ -71,9 +72,7 @@ export const compileBGEX = (token: BGEXModule, exports: Map<string, Exports>): s
         asm.push(...token.exportFunctions.map(e => compileFunc(scope, e, escapeFunction(token.path, e.name))))
     
         return asm.join("\n");
-    }catch(cause){
-        if(cause instanceof Error)
-            throw new Error(`${cause.message} at ${token.path}`, { cause });
-        else throw cause;
+    }catch(e){
+        throw printError(e, token.path);
     }
 }

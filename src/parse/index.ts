@@ -5,6 +5,7 @@ import { serr } from "../util"
 import { parseFunction, type BGEXFunction } from "./func"
 import { parseVariable, type BGEXVar } from "./var"
 import type { BGEXScope } from "../compile"
+import { printError } from "../error"
 
 export type MacroType = (scope: BGEXScope, ...args: (Expression|SpreadElement)[]) => string;
 
@@ -100,9 +101,7 @@ export const parseBGEX = async(path: string): Promise<BGEXModule | undefined> =>
                         c++
                     }
                 }
-                console.log(`Internal callstack: ${e.stack}`);
-                console.error(`SyntaxError: ${e.message} at ${path}:${l}:${c}`);
-                return;
+                printError(e, `${path}:${l}:${c}`);
             }
         }
         throw e;
