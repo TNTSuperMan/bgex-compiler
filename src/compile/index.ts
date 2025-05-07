@@ -66,8 +66,8 @@ export const compileBGEX = (token: BGEXModule, exports: Map<string, Exports>): s
         return asm.join("\n");
     }catch(e){
         if(e instanceof Error){
-            //console.error(e);
-            throw new Error(e.message + " at " + token.path, { cause: e });
+            console.error(e);
+            throw new Error(e.message + " at " + token.path);
         }else throw e;
     }
 }
