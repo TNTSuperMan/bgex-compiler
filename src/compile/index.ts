@@ -71,10 +71,9 @@ export const compileBGEX = (token: BGEXModule, exports: Map<string, Exports>): s
         asm.push(...token.exportFunctions.map(e => compileFunc(scope, e, escapeFunction(token.path, e.name))))
     
         return asm.join("\n");
-    }catch(e){
-        if(e instanceof Error){
-            console.error(e);
-            throw new Error(e.message + " at " + token.path);
-        }else throw e;
+    }catch(cause){
+        if(cause instanceof Error)
+            throw new Error(`${cause.message} at ${token.path}`, { cause });
+        else throw cause;
     }
 }

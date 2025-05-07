@@ -100,8 +100,8 @@ export const parseBGEX = async(path: string): Promise<BGEXModule | undefined> =>
                         c++
                     }
                 }
-                console.error(`SyntaxError: ${e.message} at ${path}:${l}:${c}`)
-                console.error(`Internal callstack: ${e.stack}`)
+                console.log(`Internal callstack: ${e.stack}`);
+                console.error(`SyntaxError: ${e.message} at ${path}:${l}:${c}`);
                 return;
             }
         }

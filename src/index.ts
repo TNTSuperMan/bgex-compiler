@@ -37,7 +37,11 @@ ${resources?.() ?? ""}`;
         const binary = assemble(assembly);
         return [assembly, varMap, binary[0], binary[1]];
     }catch(e){
-        console.error(e);
+        if(e instanceof Error){
+            if(e.cause instanceof Error)
+                console.log("Internal callstack:" + e.cause.stack);
+            console.error(`${e.name}: ${e.message}`);
+        }else throw e;
         return [assembly, varMap];
     }
 }
