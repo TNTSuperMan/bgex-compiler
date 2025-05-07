@@ -52,13 +52,20 @@ export const compileBGEX = (token: BGEXModule, exports: Map<string, Exports>): s
                 }
             })
         })
+
+        exports.get(token.path)?.forEach(e=>{
+            if(e[0] == 0){
+                scope.funcs.set(e[1], e);
+            }else{
+                scope.vars[0]?.set(e[1], e[2]);
+            }
+        });
     
         const vars: Variable[] = token.vars.map(e=>parseVariable(scope, e));
         vars.forEach(e=>scope.vars[0]?.set(e[1], e));
     
         const fnmap: [BGEXFunction, `${string}-${string}-${string}-${string}-${string}`][] = token.funcs.map(e=>[e, crypto.randomUUID()]);
         fnmap.forEach(e=>scope.funcs.set(e[0].name, toExportiveFunction(e[0], e[1])))
-        token.exportFunctions.forEach(e=>scope.funcs.set(e.name, toExportiveFunction(e, token.path)))
     
         asm.push(...fnmap.map(e => compileFunc(scope, e[0], escapeFunction(e[1], e[0].name))))
         asm.push(...token.exportFunctions.map(e => compileFunc(scope, e, escapeFunction(token.path, e.name))))
