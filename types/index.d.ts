@@ -1,3 +1,14 @@
+interface Array<T> {}
+interface Boolean {}
+interface CallableFunction {}
+interface Function {}
+interface IArguments {}
+interface NewableFunction {}
+interface Number {}
+interface Object {}
+interface RegExp {}
+interface String {}
+
 declare function dumpkey(): number;
 declare function redraw(): void;
 declare function rect(x: number, y: number, w: number, h: number, color: number): void;
